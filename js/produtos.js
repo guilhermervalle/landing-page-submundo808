@@ -167,7 +167,23 @@
                         </div>
                     </div>
 
-                    <button class="add-bag" id="addBag">Adicionar à sacola</button>
+                    <button class="add-bag" id="addBag">
+                        <div class="add-bag-inner">
+                            <span class="arrow arrow-left">
+                                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+                                    <line x1="6" y1="18" x2="18" y2="6" />
+                                    <polyline points="8 6 18 6 18 16" />
+                                </svg>
+                            </span>
+                            <span class="text">Adicionar à sacola</span>
+                            <span class="arrow arrow-right">
+                                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+                                    <line x1="6" y1="18" x2="18" y2="6" />
+                                    <polyline points="8 6 18 6 18 16" />
+                                </svg>
+                            </span>
+                        </div>
+                    </button>
                     <p class="add-feedback" id="addFeedback"></p>
                 </div>
             </div>`;
