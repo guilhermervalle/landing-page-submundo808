@@ -135,18 +135,17 @@ h1, h2, h3, h4 {
 /* Hover Dim Effect (Like Latest News) */
 .hover-dim-group:hover .hover-dim-item {
     opacity: var(--hover-dim);
-    filter: blur(2px);
-    transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease, color 0.4s ease;
 }
 
 .hover-dim-group .hover-dim-item {
-    transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease, color 0.4s ease;
 }
 
 .hover-dim-group .hover-dim-item:hover {
     opacity: 1 !important;
-    filter: blur(0px) !important;
-    transform: scale(1.02);
+    transform: scale(1.2);
+    color: var(--accent) !important;
     z-index: 10;
 }
 
@@ -1013,6 +1012,7 @@ h1, h2, h3, h4 {
 .social-links {
     display: flex;
     gap: 20px;
+    align-items: center;
 }
 
 .social-links a {
