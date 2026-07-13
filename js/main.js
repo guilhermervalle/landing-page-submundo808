@@ -4,14 +4,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let lenis = null;
     if (window.Lenis) {
         lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+        window.__lenis = lenis;
     }
 
     // 1. Custom Cursor
     const cursor = document.querySelector('.custom-cursor');
-    
+
+    // Zones that use the native OS cursor instead of the custom dot (e.g. the
+    // Spotify player) — a cross-origin iframe captures the mouse and would freeze
+    // the custom cursor at its edge, so we simply disable it over the whole section.
+    let nativeCursorZone = false;
+
     document.addEventListener('mousemove', (e) => {
         cursor.style.left = e.clientX + 'px';
         cursor.style.top = e.clientY + 'px';
+        cursor.style.opacity = nativeCursorZone ? '0' : '1';
+    });
+
+    document.querySelectorAll('.native-cursor').forEach((zone) => {
+        zone.addEventListener('mouseenter', () => {
+            nativeCursorZone = true;
+            cursor.style.opacity = '0';
+        });
+        zone.addEventListener('mouseleave', () => {
+            nativeCursorZone = false;
+        });
     });
 
     // Add hover effect to interactive elements
@@ -201,11 +218,24 @@ document.addEventListener('DOMContentLoaded', () => {
         gsap.registerPlugin(ScrollTrigger);
         if (hasSplit) gsap.registerPlugin(SplitText);
 
-        // Drive Lenis through GSAP's ticker so scroll + ScrollTrigger stay in sync
+        // Keep ScrollTrigger synced with Lenis. Drive Lenis with the NATIVE
+        // requestAnimationFrame timestamp (a monotonic clock) rather than gsap.ticker
+        // time. This is what fixes the "animation stops after the page sits idle / the
+        // tab is backgrounded" bug: rAF pauses while idle, and on resume the previous
+        // approach passed one giant time jump straight to Lenis, which froze its scroll
+        // (and the scroll-driven parallax with it). With the native timestamp Lenis
+        // simply snaps once and keeps going. GSAP's own ticker still drives the scrubbed
+        // animations and stays in sync via the scroll event.
         if (lenis) {
             lenis.on('scroll', ScrollTrigger.update);
-            gsap.ticker.add((time) => lenis.raf(time * 1000));
+            const lenisRaf = (time) => { lenis.raf(time); requestAnimationFrame(lenisRaf); };
+            requestAnimationFrame(lenisRaf);
             gsap.ticker.lagSmoothing(0);
+
+            // Re-sync when returning to the tab after it was hidden for a while.
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) ScrollTrigger.update();
+            });
         }
 
         // Scroll-linked text reveal: letters brighten from dim to white as the
