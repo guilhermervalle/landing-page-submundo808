@@ -5,55 +5,62 @@
 (function () {
     'use strict';
 
-    // --- Catálogo (troque as imagens em assets/img/loja/ pelas fotos reais) ---
+    // --- Catálogo (imagens em assets/img/loja/) ---
+    // imgs   = [FRENTE, VERSO]  -> aparecem na home da loja (grid) E como 1ª/2ª foto do produto.
+    //          arquivos: <id>-1.webp (frente) e <id>-2.webp (verso).
+    // galeria= [fotos extras]   -> aparecem SOMENTE na página do produto, depois da frente/verso.
+    //          arquivos: <id>-3.webp, <id>-4.webp, ...  (omita o campo se o produto só tem 2 fotos).
+    // Ajuste os PREÇOS conforme o real.
     const PRODUTOS = [
         {
-            id: 'camiseta-submundo', nome: 'Camiseta Submundo 808', preco: 89.90, categoria: 'Vestuário',
-            desc: 'Camiseta oversized em algodão pesado com a estampa clássica do Submundo 808. Feita para a pista e para a rua.',
+            id: 'camiseta-preta', nome: 'Camiseta Preta', preco: 89.90, categoria: 'Vestuário',
+            desc: 'Camiseta preta em algodão pesado com a estampa do Submundo 808. Feita para a pista e para a rua.',
             tamanhos: ['P', 'M', 'G', 'GG'],
-            imgs: ['assets/img/loja/produto-01-a.webp', 'assets/img/loja/produto-01-b.webp']
+            imgs: ['assets/img/loja/camiseta-preta-1.webp', 'assets/img/loja/camiseta-preta-2.webp'],
+            // Exemplo de fotos extras (só na página do produto). Apague se não usar:
+            galeria: ['assets/img/loja/camiseta-preta-3.webp', 'assets/img/loja/camiseta-preta-4.webp']
         },
         {
-            id: 'moletom-underground', nome: 'Moletom Underground', preco: 179.90, categoria: 'Vestuário',
-            desc: 'Moletom com capuz, felpa interna e caimento amplo. A peça definitiva para as noites frias do underground.',
+            id: 'camiseta-branca', nome: 'Camiseta Branca', preco: 89.90, categoria: 'Vestuário',
+            desc: 'Camiseta branca em algodão pesado com estampa do Submundo 808. Corte reto e macio.',
             tamanhos: ['P', 'M', 'G', 'GG'],
-            imgs: ['assets/img/loja/produto-02-a.webp', 'assets/img/loja/produto-02-b.webp']
+            imgs: ['assets/img/loja/camiseta-branca-1.webp', 'assets/img/loja/camiseta-branca-2.webp']
         },
         {
-            id: 'bone-sm808', nome: 'Boné SM808', preco: 69.90, categoria: 'Acessório',
-            desc: 'Boné de aba curva com bordado do logo SM808. Ajuste traseiro para caber em qualquer cabeça.',
+            id: 'moletom-preto', nome: 'Moletom Careca Preto', preco: 179.90, categoria: 'Vestuário',
+            desc: 'Moletom careca (crewneck) preto, felpa interna e caimento amplo. A peça das noites frias do underground.',
+            tamanhos: ['P', 'M', 'G', 'GG'],
+            imgs: ['assets/img/loja/moletom-preto-1.webp', 'assets/img/loja/moletom-preto-2.webp']
+        },
+        {
+            id: 'bone-preto', nome: 'Boné Preto', preco: 69.90, categoria: 'Acessório',
+            desc: 'Boné preto com bordado do logo SM808 e ajuste traseiro.',
             tamanhos: ['Único'],
-            imgs: ['assets/img/loja/produto-03-a.webp', 'assets/img/loja/produto-03-b.webp']
+            imgs: ['assets/img/loja/bone-preto-1.webp', 'assets/img/loja/bone-preto-2.webp']
         },
         {
-            id: 'camiseta-baile', nome: 'Camiseta Baile', preco: 89.90, categoria: 'Vestuário',
-            desc: 'Estampa exclusiva inspirada na energia crua dos bailes. Algodão macio, corte reto.',
-            tamanhos: ['P', 'M', 'G', 'GG'],
-            imgs: ['assets/img/loja/produto-04-a.webp', 'assets/img/loja/produto-04-b.webp']
-        },
-        {
-            id: 'regata-808', nome: 'Regata 808', preco: 79.90, categoria: 'Vestuário',
-            desc: 'Regata leve para os dias quentes de pista. Estampa 808 na frente e assinatura nas costas.',
-            tamanhos: ['P', 'M', 'G', 'GG'],
-            imgs: ['assets/img/loja/produto-05-a.webp', 'assets/img/loja/produto-05-b.webp']
-        },
-        {
-            id: 'leque-oficial', nome: 'Leque Oficial', preco: 39.90, categoria: 'Acessório',
-            desc: 'Leque oficial do Submundo 808. Refresca a pista e faz barulho na hora do drop.',
+            id: 'toca-offwhite', nome: 'Toca Offwhite', preco: 59.90, categoria: 'Acessório',
+            desc: 'Toca (gorro) offwhite em tricô, com etiqueta do Submundo 808. Aquece com estilo.',
             tamanhos: ['Único'],
-            imgs: ['assets/img/loja/produto-06-a.webp', 'assets/img/loja/produto-06-b.webp']
+            imgs: ['assets/img/loja/toca-offwhite-1.webp', 'assets/img/loja/toca-offwhite-2.webp']
         },
         {
-            id: 'copo-oficial', nome: 'Copo Oficial', preco: 29.90, categoria: 'Acessório',
-            desc: 'Copo reutilizável com o logo do Submundo. Leve pra casa como lembrança da noite.',
+            id: 'mochila-couro', nome: 'Bolsa de Couro', preco: 199.90, categoria: 'Acessório',
+            desc: 'Mochila/bolsa de couro com acabamento premium e o selo do Submundo 808.',
             tamanhos: ['Único'],
-            imgs: ['assets/img/loja/produto-07-a.webp', 'assets/img/loja/produto-07-b.webp']
+            imgs: ['assets/img/loja/mochila-couro-1.webp', 'assets/img/loja/mochila-couro-2.webp']
         },
         {
-            id: 'moletom-dark', nome: 'Moletom Dark', preco: 189.90, categoria: 'Vestuário',
-            desc: 'Versão all black do moletom Submundo. Estética dark, conforto absoluto.',
-            tamanhos: ['P', 'M', 'G', 'GG'],
-            imgs: ['assets/img/loja/produto-08-a.webp', 'assets/img/loja/produto-08-b.webp']
+            id: 'chaveiro', nome: 'Chaveiro', preco: 19.90, categoria: 'Acessório',
+            desc: 'Chaveiro oficial do Submundo 808. Leve a cena no bolso.',
+            tamanhos: ['Único'],
+            imgs: ['assets/img/loja/chaveiro-1.webp', 'assets/img/loja/chaveiro-2.webp']
+        },
+        {
+            id: 'copo-festa', nome: 'Copo de Festa', preco: 29.90, categoria: 'Acessório',
+            desc: 'Copo de festa reutilizável com o logo do Submundo. Lembrança oficial da noite.',
+            tamanhos: ['Único'],
+            imgs: ['assets/img/loja/copo-festa-1.webp', 'assets/img/loja/copo-festa-2.webp']
         }
     ];
 
@@ -136,11 +143,13 @@
         let tamanhoSel = p.tamanhos.length === 1 ? p.tamanhos[0] : null;
         let qtd = 1;
 
+        // Galeria da página do produto = as 2 do grid (frente/verso) + fotos extras opcionais
+        const galeria = [p.imgs[0], p.imgs[1]].concat(p.galeria || []);
+
         root.innerHTML = `
             <div class="produto-detalhe">
                 <div class="produto-galeria">
-                    <img src="${p.imgs[0]}" alt="${p.nome}">
-                    <img src="${p.imgs[1]}" alt="${p.nome} — verso">
+                    ${galeria.map((src, i) => `<img src="${src}" alt="${p.nome}${i ? ' — foto ' + (i + 1) : ''}">`).join('')}
                 </div>
                 <div class="produto-lado">
                     <a class="voltar-loja" href="loja.html">
