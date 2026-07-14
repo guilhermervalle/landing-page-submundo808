@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let lenis = null;
     if (window.Lenis) {
         lenis = new Lenis({ duration: 1.1, smoothWheel: true });
-        window.__lenis = lenis;
     }
 
     // 1. Custom Cursor
@@ -323,6 +322,121 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Title mask reveal is handled by the CSS keyframe (`.reveal-up-text`) —
         // reliable and visually identical, and it can never get stuck hidden.
+
+        // ============================================================
+        // 7. Loja teaser — animação scroll-driven (pin + montagem), estilo "About"
+        //    do hellohello.is. A seção fica PINADA e, conforme o scroll:
+        //      - as imagens crescem "do nada" no rodapé e sobem montando a pilha,
+        //        uma após a outra (staggered);
+        //      - o texto da esquerda revela linha a linha;
+        //      - o texto da direita e o CTA aparecem no fim.
+        //    Tudo atrelado ao scroll (scrub). refreshPriority garante que o pin seja
+        //    calculado ANTES das seções seguintes (não quebra a "Nossa Essência").
+        // ============================================================
+        const lojaSection = document.querySelector('#loja');
+        if (lojaSection) {
+            const lojaImgs = gsap.utils.toArray('#loja .lt-img');
+            const lojaTitle = lojaSection.querySelector('.loja-teaser-title');
+            const leftText = lojaSection.querySelector('.loja-teaser-left');
+            const rightText = lojaSection.querySelector('.loja-teaser-right');
+            const lojaCta = lojaSection.querySelector('.loja-teaser-cta');
+
+            // O título NÃO anima: aparece já pronto e fica por cima das imagens
+            // (z-index definido no CSS) — as fotos passam ATRÁS das letras.
+
+            const mm = gsap.matchMedia();
+
+            // >>> DESKTOP: seção pinada + montagem passo a passo (atrelada ao scroll) <<<
+            mm.add('(min-width: 1001px)', () => {
+                // divide os dois textos laterais em linhas para revelar uma a uma
+                const leftSplit  = (hasSplit && leftText)  ? new SplitText(leftText,  { type: 'lines', linesClass: 'lt-line' }) : null;
+                const rightSplit = (hasSplit && rightText) ? new SplitText(rightText, { type: 'lines', linesClass: 'lt-line' }) : null;
+                const leftLines  = leftSplit  ? leftSplit.lines  : (leftText  ? [leftText]  : []);
+                const rightLines = rightSplit ? rightSplit.lines : (rightText ? [rightText] : []);
+
+                const tl = gsap.timeline({
+                    defaults: { ease: 'none' },
+                    scrollTrigger: {
+                        trigger: lojaSection,
+                        start: 'top top',        // pina quando o topo encosta no topo
+                        end: '+=400%',           // <<< ÚNICO botão de RITMO: aumente p/ mais lento
+                        scrub: 1,                // atrela o timeline ao scroll
+                        pin: true,
+                        anticipatePin: 1,
+                        refreshPriority: 1,      // calcula este pin antes das próximas seções
+                        invalidateOnRefresh: true,
+                    },
+                });
+
+                // Helper: entrada de uma imagem — cresce do rodapé e sobe até o lugar.
+                // A ESCALA termina antes do DESLOCAMENTO: a imagem chega ao tamanho
+                // máximo e ainda sobe mais um pouco (o topo entra atrás do título).
+                const enterImg = (img, at, fromScale, scaleDur, fromY, yDur) => {
+                    if (!img) return;
+                    tl.fromTo(img, { opacity: 0 },                                    { opacity: 1, duration: 0.8, ease: 'power1.out' }, at);
+                    tl.fromTo(img, { scale: fromScale, transformOrigin: '50% 100%' }, { scale: 1,   duration: scaleDur, ease: 'power2.out' }, at);
+                    tl.fromTo(img, { yPercent: fromY },                               { yPercent: 0, duration: yDur,   ease: 'power1.out' }, at);
+                };
+
+                // ---- PRÉ-ENTRADA (fora do pin) ----
+                // A 1ª imagem já começa a subir ENQUANTO a seção entra na tela (a seção
+                // anterior ainda aparece). Vai do fundo até o estado inicial do pin
+                // (yPercent 135 / scale 0.22), onde o timeline pinado assume sem salto.
+                if (lojaImgs[0]) {
+                    gsap.fromTo(lojaImgs[0],
+                        { yPercent: 130, scale: 0.15, opacity: 0, transformOrigin: '50% 100%' },
+                        { yPercent: 25, scale: 0.3, opacity: 1, ease: 'none',
+                          scrollTrigger: {
+                              trigger: lojaSection,
+                              start: 'top bottom',   // topo da seção surge por baixo
+                              end: 'top top',        // até encostar no topo (início do pin)
+                              scrub: true,
+                          }});
+                }
+
+                // ---- Sequência em "beats" (~1 scrollada cada) ----
+                // 1ª imagem: CONTINUA de onde a pré-entrada parou (25/0.3) até o lugar
+                // final. O "subir" vem sobretudo do CRESCIMENTO (origem embaixo empurra
+                // o topo pra cima). immediateRender:false p/ não sobrescrever no load.
+                tl.fromTo(lojaImgs[0], { scale: 0.3, transformOrigin: '50% 100%' },
+                    { scale: 1,   duration: 4.5, ease: 'power2.out', immediateRender: false }, 0);
+                tl.fromTo(lojaImgs[0], { yPercent: 25 },
+                    { yPercent: 0, duration: 6,   ease: 'power1.out', immediateRender: false }, 0);
+
+                // texto da esquerda revela linha a linha, acompanhando as imagens
+                if (leftLines.length)
+                    tl.from(leftLines, { yPercent: 120, opacity: 0, stagger: 0.9, duration: 1.2, ease: 'power2.out' }, 3.5);
+
+                enterImg(lojaImgs[1], 3.5, 0.30, 3.5, 135, 5);   // 2ª imagem: sobe sobrepondo a 1ª
+                enterImg(lojaImgs[2], 8,   0.32, 3,   135, 5);   // 3ª imagem: sobe sobrepondo as anteriores
+
+                // texto da direita só no fim (revela linha a linha)
+                if (rightLines.length)
+                    tl.from(rightLines, { yPercent: 120, opacity: 0, stagger: 0.6, duration: 1, ease: 'power2.out' }, 12);
+
+                if (lojaCta) tl.from(lojaCta, { opacity: 0, y: 30, duration: 1, ease: 'power2.out' }, 13.5);
+
+                // respiro final antes de "despinar"
+                tl.to({}, { duration: 1 }, 14.5);
+
+                // limpeza ao trocar de breakpoint
+                return () => {
+                    if (tl.scrollTrigger) tl.scrollTrigger.kill();
+                    tl.kill();
+                    if (leftSplit)  leftSplit.revert();
+                    if (rightSplit) rightSplit.revert();
+                };
+            });
+
+            // >>> MOBILE: sem pin — apenas fade-in simples ao entrar em tela <<<
+            mm.add('(max-width: 1000px)', () => {
+                const els = [leftText, rightText, lojaCta].filter(Boolean).concat(lojaImgs);
+                els.forEach((el, i) => gsap.from(el, {
+                    opacity: 0, y: 40, duration: 0.9, ease: 'power3.out', delay: (i % 4) * 0.08,
+                    scrollTrigger: { trigger: lojaSection, start: 'top 75%' },
+                }));
+            });
+        }
     } else {
         // Fallback (libs failed to load): keep a plain rAF loop for Lenis + manual parallax.
         if (lenis) {
