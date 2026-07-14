@@ -18,13 +18,14 @@
             tamanhos: ['P', 'M', 'G', 'GG'],
             imgs: ['assets/img/loja/camiseta-preta-1.webp', 'assets/img/loja/camiseta-preta-2.webp'],
             // Exemplo de fotos extras (só na página do produto). Apague se não usar:
-            galeria: ['assets/img/loja/camiseta-preta-3.webp', 'assets/img/loja/camiseta-preta-4.webp']
+            galeria: ['assets/img/loja/camiseta-preta-3.webp']
         },
         {
             id: 'camiseta-branca', nome: 'Camiseta Branca', preco: 89.90, categoria: 'Vestuário',
             desc: 'Camiseta branca em algodão pesado com estampa do Submundo 808. Corte reto e macio.',
             tamanhos: ['P', 'M', 'G', 'GG'],
-            imgs: ['assets/img/loja/camiseta-branca-1.webp', 'assets/img/loja/camiseta-branca-2.webp']
+            imgs: ['assets/img/loja/camiseta-branca-1.webp', 'assets/img/loja/camiseta-branca-2.webp'],
+            galeria: ['assets/img/loja/camiseta-branca-3.webp']
         },
         {
             id: 'moletom-preto', nome: 'Moletom Careca Preto', preco: 179.90, categoria: 'Vestuário',
@@ -215,11 +216,20 @@
         root.querySelector('#qtdMais').addEventListener('click', () => { qtd += 1; qtdVal.textContent = qtd; });
 
         // add to bag
-        function feedback(msg) { root.querySelector('#addFeedback').textContent = msg; }
+        let feedbackTimeout;
+        function feedback(msg, duration = 0) { 
+            root.querySelector('#addFeedback').textContent = msg; 
+            clearTimeout(feedbackTimeout);
+            if (duration > 0 && msg !== '') {
+                feedbackTimeout = setTimeout(() => {
+                    root.querySelector('#addFeedback').textContent = '';
+                }, duration);
+            }
+        }
         root.querySelector('#addBag').addEventListener('click', () => {
-            if (!tamanhoSel) { feedback('Selecione um tamanho.'); return; }
+            if (!tamanhoSel) { feedback('Selecione um tamanho.', 8000); return; }
             addToCart(p.id, tamanhoSel, qtd);
-            feedback(`Adicionado à sacola — ${qtd}× ${p.nome} (${tamanhoSel}).`);
+            feedback(`Adicionado à sacola — ${qtd}× ${p.nome} (${tamanhoSel}).`, 8000);
         });
     }
 
@@ -242,9 +252,13 @@
                 <div class="sacola-lista">
                     ${cart.map((i) => `
                         <div class="sacola-item" data-id="${i.id}" data-tam="${i.tamanho}">
-                            <img src="${i.img}" alt="${i.nome}">
+                            <a href="produto.html?id=${i.id}">
+                                <img src="${i.img}" alt="${i.nome}">
+                            </a>
                             <div class="sacola-item-info">
-                                <p class="nome">${i.nome}</p>
+                                <a href="produto.html?id=${i.id}" style="text-decoration: none; color: inherit;">
+                                    <p class="nome">${i.nome}</p>
+                                </a>
                                 <p class="meta">Tamanho: ${i.tamanho}</p>
                                 <button class="remover" data-remove>Remover</button>
                             </div>
@@ -260,7 +274,7 @@
                 </div>
                 <div class="sacola-resumo">
                     <div class="linha-total"><span>Total</span><span>${BRL(cartTotal())}</span></div>
-                    <a class="btn btn-primary sacola-checkout" href="#" id="checkout">Finalizar pedido</a>
+                    <a class="btn-ticket sacola-checkout" href="#" id="checkout">Finalizar pedido</a>
                     <p class="sacola-obs">Frete e pagamento combinados no checkout.</p>
                 </div>`;
 

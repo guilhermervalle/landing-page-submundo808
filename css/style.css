@@ -251,11 +251,11 @@ h1, h2, h3, h4 {
     }
     .menu-toggle { padding: 10px 0 10px 4px; }
     .menu-toggle .line { width: 26px; }
-    .logo img { height: 32px; }
+    .logo img { height: 50px; }
 }
 
 .logo img {
-    height: 40px;
+    height: 62px;
 }
 
 .logo-text {
@@ -635,11 +635,27 @@ h1, h2, h3, h4 {
     justify-content: center;
     align-items: center;
     color: #fff;
+    border-radius: 50%;
     opacity: 1;
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    box-shadow: 0 0 0 rgba(229, 0, 0, 0.6);
+    transition: opacity 0.6s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
-.video-play svg { width: 26px; height: 26px; }
+.video-play:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    background: #ff1a1a;
+    box-shadow: 0 6px 26px rgba(229, 0, 0, 0.45);
+}
+
+.video-play svg {
+    width: 26px;
+    height: 26px;
+    transition: transform 0.3s ease;
+}
+
+.slider_slide.is-left .video-play svg {
+    transform: rotate(180deg);
+}
 
 .slider_slide.active .video-play {
     opacity: 0;
@@ -1375,29 +1391,35 @@ h1, h2, h3, h4 {
 .tamanho-btn {
     min-width: 46px;
     padding: 8px 14px;
-    border: 1px solid rgba(255,255,255,0.25);
+    border: none;
     background: transparent;
     color: #fff;
     cursor: pointer;
-    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-family: 'Tactic-Sans-Medium', sans-serif;
     transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.tamanho-btn:hover { border-color: #fff; }
-.tamanho-btn.active { background: #fff; color: #000; border-color: #fff; }
+.tamanho-btn:hover { color: var(--accent); transform: scale(1.2); }
+.tamanho-btn.active { color: var(--accent); transform: scale(1.2); }
 
 .qtd { display: flex; align-items: center; gap: 18px; }
 .qtd button {
     width: 40px;
     height: 40px;
-    border: 1px solid rgba(255,255,255,0.25);
+    border: none;
     background: transparent;
     color: #fff;
     font-size: 1.4rem;
     line-height: 1;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.qtd button:hover { border-color: #fff; }
+.qtd button:hover { color: var(--accent); transform: scale(1.2); }
 .qtd span { min-width: 28px; text-align: center; font-size: 1.2rem; }
 
 .add-bag {
@@ -1463,10 +1485,11 @@ h1, h2, h3, h4 {
     transform: translateX(15px);
 }
 
-.add-feedback { margin-top: 12px; color: var(--accent); font-size: 0.9rem; min-height: 1.2em; }
+.add-feedback { margin-top: 12px; color: #fff; font-size: 0.9rem; min-height: 1.2em; }
 
 /* ============ SACOLA ============ */
 .sacola-wrap { max-width: 1000px; margin: 0 auto; padding: 0 40px 40px; }
+.sacola-wrap .loja-title { text-align: center; font-size: clamp(2.5rem, 10vw, 8rem); margin-bottom: 40px; }
 
 .sacola-vazia { text-align: center; padding: 60px 0; }
 .sacola-vazia p { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 20px; }
@@ -1507,7 +1530,7 @@ h1, h2, h3, h4 {
     padding: 20px 0;
     border-top: 1px solid rgba(255,255,255,0.15);
 }
-.sacola-checkout { display: block; text-align: center; width: 100%; }
+.sacola-checkout { display: flex; justify-content: center; text-align: center; width: 100%; font-size: 1rem; padding: 1rem; }
 .sacola-obs { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 14px; }
 
 @media (max-width: 900px) {
@@ -1574,13 +1597,18 @@ h1, h2, h3, h4 {
 
 .footer-social {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     align-items: center;
 }
 
 .footer-social a {
     color: var(--text-muted);
     transition: color 0.3s ease;
+}
+
+.footer-social a svg {
+    width: 26px;
+    height: 26px;
 }
 
 .footer-social a:hover {
@@ -1646,6 +1674,201 @@ h1, h2, h3, h4 {
     border-top: 1px solid rgba(255,255,255,0.05);
     padding-top: 20px;
     gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-bottom .copyright {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.payment-icons {
+    display: flex;
+    gap: 10px;
+}
+
+.pay-icon {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Floating Whatsapp */
+.float-whatsapp {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: transform 0.3s;
+}
+
+.float-whatsapp:hover {
+    transform: scale(1.1);
+}
+
+.float-whatsapp svg {
+    width: 35px;
+    height: 35px;
+}
+
+/* Responsive Footer */
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .footer-col-news {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+    .float-whatsapp {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+    .float-whatsapp svg { width: 30px; height: 30px; }
+}
+
+
+/* ============ LOJA (teaser na home — scroll-driven / pinned) ============ */
+.loja-teaser {
+    position: relative;
+    background: #000;
+    overflow: hidden;          /* mantém o parallax das imagens dentro da seção */
+    min-height: 100vh;         /* ocupa a viewport para o "pin" ficar limpo */
+    display: flex;
+    align-items: center;
+    padding: 48px 0;
+}
+
+.loja-teaser-grid { width: 100%; }
+
+.loja-teaser-title {
+    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-size: clamp(2rem, 4.4vw, 4.6rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: #fafafa;
+    max-width: 90%;
+    margin: 0 0 clamp(28px, 4vh, 48px);
+}
+.loja-teaser-title .dim { color: #777; }
+
+.loja-teaser-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr minmax(300px, 520px) 1fr;
+    align-items: center;
+    gap: 50px;
+}
+
+.loja-teaser-text {
+    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-size: clamp(1rem, 1.35vw, 1.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fafafa;
+    max-width: 340px;
+}
+.loja-teaser-text.right { justify-self: end; }
+
+/* Overlapping product images */
+.loja-teaser-media {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 5 / 6;
+    margin: 0 auto;
+}
+.lt-img {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    will-change: transform, opacity;
+    /* SEM transition: transform aqui — o GSAP controla o transform via scrub e
+       uma transição CSS causaria conflito (as imagens ficariam presas). */
+}
+.lt-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lt-img-1 { width: 56%; aspect-ratio: 3 / 4; top: 0; left: 36%; z-index: 1; }
+.lt-img-2 { width: 66%; aspect-ratio: 3 / 2; top: 46%; left: 24%; z-index: 2; }
+.lt-img-3 { width: 40%; aspect-ratio: 3 / 4; top: 36%; left: 0; z-index: 3; }
+
+.loja-teaser-cta { margin-top: clamp(24px, 4vh, 44px); text-align: center; }
+
+/* ---- DESKTOP: layout sobreposto (pinned) — título POR CIMA das imagens ----
+   O stage central ocupa 100vh; as fotos sobem e o topo entra atrás do título,
+   criando o efeito das letras sobre a imagem (igual à referência hellohello). */
+@media (min-width: 1001px) {
+    .loja-teaser { min-height: 100vh; padding: 0; display: block; }
+    .loja-teaser-grid { position: relative; height: 100vh; max-width: none; padding: 0; }
+
+    /* título fixo no topo, largura quase total, ACIMA das imagens */
+    .loja-teaser-title {
+        position: absolute; top: 92px; left: 48px; right: 48px;
+        max-width: none; margin: 0; z-index: 5;
+    }
+
+    /* inner deixa de ser grid — os filhos são posicionados em absoluto */
+    .loja-teaser-inner { position: static; display: block; gap: 0; }
+
+    /* textos laterais, acima de tudo */
+    .loja-teaser-text {
+        position: absolute; top: 50%; z-index: 6;
+        max-width: 320px; margin: 0;
+    }
+    .loja-teaser-left  { left: 48px;  transform: translateY(-6%); }
+    .loja-teaser-right { right: 48px; transform: translateY(-6%); text-align: left; justify-self: auto; }
+
+    /* stage central alto (100vh) onde as imagens se empilham */
+    .loja-teaser-media {
+        position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+        width: min(600px, 42vw); height: 100vh; max-width: none;
+        aspect-ratio: auto; margin: 0; z-index: 2;
+    }
+
+    /* posições FINAIS do colar de imagens (yPercent:0 do GSAP corresponde a estas) */
+    .lt-img-1 { width: 78%; aspect-ratio: 3 / 4; top: 12%; left: 14%; z-index: 1; }
+    .lt-img-2 { width: 68%; aspect-ratio: 4 / 5; top: 45%; left: 26%; z-index: 2; }
+    .lt-img-3 { width: 46%; aspect-ratio: 3 / 4; top: 47%; left: 0;   z-index: 3; }
+
+    .loja-teaser-cta {
+        position: absolute; right: 48px; bottom: 56px; z-index: 6; margin: 0; text-align: right;
+    }
+}
+
+@media (max-width: 1000px) {
+    .loja-teaser-inner {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+    .loja-teaser-text { max-width: 520px; margin: 0 auto; }
+    .loja-teaser-text.right { justify-self: center; }
     flex-wrap: wrap;
 }
 

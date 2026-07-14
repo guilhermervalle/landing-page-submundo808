@@ -155,13 +155,23 @@ document.addEventListener('DOMContentLoaded', () => {
             currentIndex = (parseInt(activeIndex) + total) % total;
 
             videoCards.forEach((card, index) => {
-                // Circular position relative to the active card: 0 = center, 1 = right, -1 = left
                 let rel = (index - currentIndex + total) % total;
                 let pos = rel;
                 if (rel > total / 2) pos = rel - total; // wrap: last item goes to the left (-1)
 
                 card.style.transform = `translate(calc(-50% + ${pos * getSideOffset()}px), -50%)`;
                 card.classList.toggle('active', index === currentIndex);
+                
+                if (pos < 0) {
+                    card.classList.add('is-left');
+                    card.classList.remove('is-right');
+                } else if (pos > 0) {
+                    card.classList.add('is-right');
+                    card.classList.remove('is-left');
+                } else {
+                    card.classList.remove('is-left', 'is-right');
+                }
+
                 // Center card sits on top; side cards behind
                 card.style.zIndex = index === currentIndex ? 10 : 5 - Math.abs(pos);
             });
