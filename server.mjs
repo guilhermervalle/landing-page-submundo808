@@ -10,7 +10,10 @@ http.createServer(async (req,res)=>{
     const file = normalize(join(root,p));
     if(!file.startsWith(root)){res.writeHead(403);return res.end('403');}
     const data = await readFile(file);
-    res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});
+    res.writeHead(200,{
+      'Content-Type':types[extname(file)]||'application/octet-stream',
+      'Cache-Control':'no-store, no-cache, must-revalidate', // dev: sempre pega arquivo novo
+    });
     res.end(data);
   }catch(e){res.writeHead(404);res.end('404 Not Found');}
 }).listen(8080,()=>console.log('Serving http://localhost:8080'));

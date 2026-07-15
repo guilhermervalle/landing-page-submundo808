@@ -153,7 +153,7 @@ h1, h2, h3, h4 {
 .btn {
     display: inline-block;
     padding: 1rem 3rem;
-    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-family: 'Tactic-Sans-Medium', sans-serif;
     font-size: 1.2rem;
     border-radius: 50px;
     transition: all 0.3s ease;
@@ -411,7 +411,7 @@ h1, h2, h3, h4 {
     z-index: 3;
     width: 100%;
     text-align: center;
-    padding: 0 4% 3vh;
+    padding: 0 2% 3vh; /* menos margem lateral p/ caber a fonte maior */
 }
 
 .title-mask {
@@ -429,18 +429,39 @@ h1, h2, h3, h4 {
 
 .hero-giant {
     font-family: 'Tactic-Sans-Title', sans-serif;
-    font-size: clamp(2rem, 10.2vw, 13rem);
+    /* cabe "SUBMUNDO + logo + 808" numa linha só, com pequena margem lateral */
+    font-size: clamp(1.3rem, 6.85vw, 8.2rem);
     line-height: 0.9;
     letter-spacing: -0.02em;
     text-transform: uppercase;
     white-space: nowrap;
     margin: 0;
-    /* metallic gray gradient — same effect as the section headings */
-    background-image: linear-gradient(180deg, #ffffff 0%, #e8e8e8 38%, #9a9a9a 66%, #4d4d4d 100%);
+    /* alinha SUBMUNDO + logo do cachorro + 808 na mesma linha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.08em;
+    /* gradiente vermelho (metálico) */
+    background-image: linear-gradient(180deg, #ff3b3b 0%, #E50000 52%, #9c0000 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+}
+
+/* Logo do cachorro entre SUBMUNDO e 808 no título do hero.
+   Mesmo gradiente metálico das letras, recortado na forma do cachorro (mask). */
+.hero-dog {
+    height: 0.7em;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 auto;
+    /* sobe um pouco p/ centralizar com as MAIÚSCULAS (a caixa de linha inclui
+       espaço de descida embaixo, o que deixava o cachorro parecendo baixo) */
+    position: relative;
+    top: -0.1em;
+    background-image: linear-gradient(180deg, #ff3b3b 0%, #E50000 52%, #9c0000 100%);
+    -webkit-mask: url('../assets/img/logo_cachorro_branco.svg') no-repeat center / contain;
+    mask: url('../assets/img/logo_cachorro_branco.svg') no-repeat center / contain;
 }
 
 .delay-1 {
@@ -465,13 +486,19 @@ h1, h2, h3, h4 {
     position: relative;
     background: #040404;
     overflow: hidden;
-    padding-bottom: 160px;
+    /* Seção de 100vh com conteúdo centralizado verticalmente: garante que título +
+       slider + régua caibam e fiquem centralizados ao rolar (sem cortar). */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(48px, 7vh, 96px) 0;
 }
 
 /* Single-word title: give it presence and balanced spacing to the slider */
 .eventos-videos .section-title {
     letter-spacing: 0.04em;
-    margin-bottom: 0.5rem;
+    margin-bottom: clamp(8px, 1.5vh, 20px);
 }
 
 /* Blurred background built from the ACTIVE card image (crossfade on change) */
@@ -535,8 +562,9 @@ h1, h2, h3, h4 {
     width: 100vw;
     left: 50%;
     transform: translateX(-50%);
-    height: 740px;
-    margin-top: 40px;
+    /* altura relativa à viewport p/ caber junto com título e régua */
+    height: min(660px, 72vh);
+    margin-top: clamp(10px, 2vh, 28px);
     z-index: 10;
 }
 
@@ -547,33 +575,31 @@ h1, h2, h3, h4 {
 
 .slider-wrapper {
     position: absolute;
-    top: 41%;
+    top: 39%;
     left: 50%;
     width: 0;
     height: 0;
 }
 
-/* Side cards (default state) */
+/* Side cards (inactive state) — tamanho base = card CENTRAL; laterais reduzem via scale */
 .slider_slide {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 600px;
-    height: 338px; /* 16:9 */
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.85;
+    /* limita pela largura E pela ALTURA da tela p/ nunca cortar (16:9) */
+    width: min(880px, 92vw, 80vh);
+    aspect-ratio: 16 / 9;
+    transform: translate(-50%, -50%) scale(0.6);
+    transform-origin: center center;
+    opacity: 0.75;
     cursor: pointer;
     z-index: 1;
     transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-                width 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-                height 1.1s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Center / active card */
+/* Center / active card (escala 1 aplicada via JS) */
 .slider_slide.active {
-    width: 880px;
-    height: 495px;
     opacity: 1;
     z-index: 10;
     cursor: default;
@@ -681,9 +707,9 @@ h1, h2, h3, h4 {
 
 .slider_slide_title h3 {
     color: var(--accent);
-    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-family: 'Tactic-Sans-Medium', sans-serif;
     font-size: 1rem;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.08em;
     margin: 0;
     text-transform: uppercase;
 }
@@ -734,11 +760,13 @@ h1, h2, h3, h4 {
 
 .slider-video_pagination-item_line_text {
     position: absolute;
-    top: -35px;
+    top: -32px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: 'Tactic-Sans-Title', sans-serif;
-    font-size: 1.2rem;
+    font-family: 'Tactic-Sans-Medium', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
     color: #444;
     transition: color 0.4s ease;
 }
@@ -789,32 +817,20 @@ h1, h2, h3, h4 {
 }
 
 /* Responsive */
-@media (max-width: 1500px) {
-    .slider_component { height: 600px; }
-    .slider_slide { width: 500px; height: 281px; }
-    .slider_slide.active { width: 720px; height: 405px; }
-}
-
+/* Tamanhos do card e do slider agora são relativos à viewport (min/vh acima),
+   então os breakpoints só ajustam detalhes decorativos. */
 @media (max-width: 1100px) {
-    .slider_component { height: 520px; }
-    .slider_slide { width: 420px; height: 236px; }
-    .slider_slide.active { width: 600px; height: 338px; }
     .corner-wrapper { top: -26px; left: -26px; right: -26px; bottom: -26px; }
     .corner { width: 24px; height: 24px; }
 }
 
 @media (max-width: 900px) {
-    .slider_component { height: 440px; }
-    .slider_slide { width: 300px; height: 169px; }
-    .slider_slide.active { width: 500px; height: 281px; }
     .slider-overlay { width: 24%; }
     .corner { width: 20px; height: 20px; }
 }
 
 @media (max-width: 560px) {
-    .slider_component { height: 340px; }
-    .slider_slide { width: 200px; height: 112px; opacity: 0.5; }
-    .slider_slide.active { width: 340px; height: 191px; }
+    .slider_slide { opacity: 0.5; }
     .slider-button { width: 40px; height: 40px; }
     .slider_slide_title h3 { font-size: 0.8rem; }
     .video-play { width: 48px; height: 48px; }
@@ -1786,7 +1802,7 @@ h1, h2, h3, h4 {
 }
 
 .loja-teaser-text {
-    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-family: 'Tactic-Sans-Medium', sans-serif;
     font-size: clamp(1rem, 1.35vw, 1.5rem);
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -1981,7 +1997,7 @@ h1, h2, h3, h4 {
 }
 
 .loja-teaser-text {
-    font-family: 'Tactic-Sans-Title', sans-serif;
+    font-family: 'Tactic-Sans-Medium', sans-serif;
     font-size: clamp(1rem, 1.35vw, 1.5rem);
     line-height: 1.15;
     letter-spacing: -0.02em;

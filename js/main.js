@@ -103,6 +103,94 @@ document.addEventListener('DOMContentLoaded', () => {
         revealTextObserver.observe(el);
     });
 
+    // 3b. Reveal dos TÍTULOS — GATILHO por IntersectionObserver (confiável em todo
+    //     navegador, incl. Edge), ANIMAÇÃO pelo GSAP (bonita, linha a linha com
+    //     máscara). NÃO usa ScrollTrigger (era o que não disparava no Edge do user).
+    //     Cobre .section-title E o título da loja (.loja-teaser-title).
+    const gsapOK  = !!window.gsap;
+    const splitOK = !!window.SplitText;
+    if (gsapOK && splitOK) { try { gsap.registerPlugin(SplitText); } catch (e) {} }
+
+    // Toca o reveal QUANDO o título entra na tela. O SplitText roda AQUI (lazy):
+    // a essa altura o usuário já rolou até o título, então as fontes já carregaram
+    // (divisão em linhas correta), sem depender de document.fonts.ready.
+    // Detecta título com gradiente (background-clip:text + fill transparente).
+    const isGradientText = (title) => {
+        const cs = getComputedStyle(title);
+        const fill = cs.webkitTextFillColor || cs.getPropertyValue('-webkit-text-fill-color');
+        return cs.backgroundImage && cs.backgroundImage !== 'none'
+            && (fill === 'transparent' || fill === 'rgba(0, 0, 0, 0)');
+    };
+
+    const revealTitle = (title) => {
+        // TODOS os títulos usam o MESMO efeito da loja: quebra em linhas com máscara
+        // e sobe cada linha com stagger. Para títulos com gradiente, corrige o
+        // "fantasma" do Edge (ver abaixo).
+        if (gsapOK && splitOK) {
+            try {
+                const grad = isGradientText(title);
+                const gradImg = grad ? getComputedStyle(title).backgroundImage : null;
+
+                const split = new SplitText(title, { type: 'lines', mask: 'lines', linesClass: 'st-line' });
+                if (split.lines && split.lines.length) {
+                    if (grad) {
+                        // Título com gradiente: aplica o gradiente em cada LINHA...
+                        split.lines.forEach((line) => {
+                            line.style.backgroundImage = gradImg;
+                            line.style.webkitBackgroundClip = 'text';
+                            line.style.backgroundClip = 'text';
+                            line.style.webkitTextFillColor = 'transparent';
+                            line.style.color = 'transparent';
+                        });
+                        // ...e MATA o gradiente/clip do PAI, senão o Edge pinta uma
+                        // cópia estática do texto por trás das linhas = "fantasma".
+                        title.style.backgroundImage = 'none';
+                        title.style.webkitBackgroundClip = 'border-box';
+                        title.style.backgroundClip = 'border-box';
+                        title.style.webkitTextFillColor = 'transparent';
+                        title.style.color = 'transparent';
+                    }
+                    gsap.set(split.lines, { yPercent: 120 });  // esconde as linhas (atrás da máscara) PRIMEIRO
+                    gsap.set(title, { autoAlpha: 1 });          // só então mostra o container
+                    gsap.to(split.lines, { yPercent: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12 });
+                    return;
+                }
+            } catch (e) { /* cai nos fallbacks abaixo */ }
+        }
+        // Fallback com GSAP (sem split): fade + subida do título inteiro
+        if (gsapOK) {
+            gsap.fromTo(title, { autoAlpha: 0, y: 44 },
+                { autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' });
+            return;
+        }
+        // Fallback puro CSS (sem GSAP)
+        title.style.transition = 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)';
+        title.style.opacity = '1';
+        title.style.transform = 'translateY(0)';
+    };
+
+    const titleObserver2 = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            obs.unobserve(el);
+            // Revela só com as FONTES prontas: evita o "pisca" de troca de fonte e o
+            // split em métricas erradas. É instantâneo se as fontes já carregaram.
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => revealTitle(el));
+            else revealTitle(el);
+        });
+    }, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
+
+    // Esconde os títulos e liga o observer IMEDIATAMENTE (sem esperar fontes),
+    // para nenhum título "escapar" do observer. O split/animação é feito no reveal.
+    document.querySelectorAll('.section-title, .loja-teaser-title').forEach((title) => {
+        if (title.dataset.rev) return;   // não prepara duas vezes
+        title.dataset.rev = '1';
+        if (gsapOK) gsap.set(title, { autoAlpha: 0 });
+        else { title.style.opacity = '0'; title.style.transform = 'translateY(44px)'; }
+        titleObserver2.observe(title);
+    });
+
     // 4. FAQ Accordion
     const accordionItems = document.querySelectorAll('.accordion-item');
     
@@ -131,10 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (videoCards.length > 0 && track) {
         const total = videoCards.length;
-        // Horizontal offset of the side cards from the center (responsive)
+        // Laterais nas extremidades (parcialmente fora da tela)
         function getSideOffset() {
-            return Math.min(780, Math.max(300, window.innerWidth * 0.46));
+            return Math.min(760, Math.max(300, window.innerWidth * 0.47));
         }
+        const SIDE_SCALE = 0.6;   // escala dos cards laterais (estado inativo)
         let currentIndex = 0;
 
         // Two stacked layers to crossfade the blurred background image
@@ -159,7 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let pos = rel;
                 if (rel > total / 2) pos = rel - total; // wrap: last item goes to the left (-1)
 
-                card.style.transform = `translate(calc(-50% + ${pos * getSideOffset()}px), -50%)`;
+                // Slide horizontal + scale (sem rotação 3D): central grande e reto no
+                // centro; laterais menores nas extremidades. Tudo anima junto via CSS.
+                const sc = pos === 0 ? 1 : SIDE_SCALE;
+                card.style.transform =
+                    `translate(calc(-50% + ${pos * getSideOffset()}px), -50%) scale(${sc})`;
                 card.classList.toggle('active', index === currentIndex);
                 
                 if (pos < 0) {
@@ -330,8 +423,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Title mask reveal is handled by the CSS keyframe (`.reveal-up-text`) —
+        // Hero title mask reveal is handled by the CSS keyframe (`.reveal-up-text`) —
         // reliable and visually identical, and it can never get stuck hidden.
+
+        // ------------------------------------------------------------
+        // 6b. Text-reveal nos títulos de seção (.section-title)
+        //     Cada título é quebrado em linhas com máscara (overflow hidden) e as
+        //     linhas sobem de baixo, com stagger, ao entrar na tela. Roda uma vez.
+        //     O título da LOJA (.loja-teaser-title) e o do HERO (.reveal-up-text)
+        //     não são .section-title, então ficam de fora (o da loja segue estático).
+        // ------------------------------------------------------------
+        // (O reveal dos títulos de seção agora é feito por IntersectionObserver na
+        //  parte 3b — independente do GSAP/fontes, mais robusto entre navegadores.)
+        // Recalcula posições dos gatilhos GSAP quando as fontes terminam de carregar
+        // (evita gatilhos defasados por reflow tardio das fontes).
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => ScrollTrigger.refresh());
+        }
 
         // ============================================================
         // 7. Loja teaser — animação scroll-driven (pin + montagem), estilo "About"
