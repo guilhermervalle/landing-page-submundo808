@@ -163,12 +163,12 @@ h1, h2, h3, h4 {
 }
 
 .btn-primary {
-    background: #fff;
-    color: #000;
+    background: var(--accent);
+    color: #fff;
 }
 
 .btn-primary:hover {
-    background: #ccc;
+    background: #ff1a1a;
     transform: scale(1.05);
 }
 
@@ -223,22 +223,21 @@ h1, h2, h3, h4 {
     display: inline-flex;
     align-items: center;
     font-family: 'Tactic-Sans-Medium', sans-serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.06em;
+    font-size: 1.2rem;
     text-transform: uppercase;
     color: #fff;
     background: var(--accent);
     padding: 0.75rem 1.7rem;
     border-radius: 50px;
     white-space: nowrap;
-    box-shadow: 0 0 0 rgba(229, 0, 0, 0.6);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-ticket:hover {
     transform: scale(1.05);
     background: #ff1a1a;
-    box-shadow: 0 6px 26px rgba(229, 0, 0, 0.45);
 }
 
 @media (max-width: 640px) {
@@ -2086,4 +2085,15 @@ h1, h2, h3, h4 {
 @media (max-width: 560px) {
     .loja-teaser-title { margin-bottom: 40px; }
     .loja-teaser-media { max-width: 320px; }
+}
+
+.spinner-svg {
+    animation: spin 1s linear infinite;
+    color: var(--accent, #fff);
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
 }

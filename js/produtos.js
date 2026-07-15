@@ -194,6 +194,18 @@
                             </span>
                         </div>
                     </button>
+                    <div id="loadingSpinner" style="display: none; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 15px;">
+                        <svg class="spinner-svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                        </svg>
+                    </div>
                     <p class="add-feedback" id="addFeedback"></p>
                 </div>
             </div>`;
@@ -228,8 +240,20 @@
         }
         root.querySelector('#addBag').addEventListener('click', () => {
             if (!tamanhoSel) { feedback('Selecione um tamanho.', 8000); return; }
-            addToCart(p.id, tamanhoSel, qtd);
-            feedback(`Adicionado à sacola — ${qtd}× ${p.nome} (${tamanhoSel}).`, 8000);
+            
+            const btn = root.querySelector('#addBag');
+            const spinner = root.querySelector('#loadingSpinner');
+            
+            btn.style.display = 'none';
+            spinner.style.display = 'flex';
+            feedback('');
+            
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                btn.style.display = '';
+                addToCart(p.id, tamanhoSel, qtd);
+                feedback(`Adicionado à sacola — ${qtd}× ${p.nome} (${tamanhoSel}).`, 8000);
+            }, 3000);
         });
     }
 
