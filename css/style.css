@@ -2097,3 +2097,91 @@ h1, h2, h3, h4 {
         transform: rotate(360deg);
     }
 }
+
+/* ============================================================
+   HERO 808 — CSS
+   Cole no FINAL do seu css/style.css
+   (usa as fontes Tactic Sans do projeto)
+   ============================================================ */
+
+/* --- Fontes da marca --- */
+@font-face {
+  font-family: 'Tactic Sans';
+  src: url('../assets/fonts/Tactic-Sans-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Tactic Sans Title';
+  src: url('../assets/fonts/Tactic-Sans-Extra-Extended-Ultra-Italic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* --- Hero container --- */
+.hero-808 {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;      /* melhor no mobile */
+  background: #000;
+  overflow: hidden;
+}
+.hero-808 canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* --- Texto por cima do objeto --- */
+.hero-808__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  pointer-events: none;   /* mouse interage com o objeto, não com o texto */
+  text-transform: uppercase;
+}
+
+/* Título — Tactic Sans Extra Extended Ultra Italic */
+.hero-808__title {
+  font-family: 'Tactic Sans Title', sans-serif;
+  color: #fff;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-size: clamp(2rem, 7vw, 5.5rem);
+  display: flex;
+  gap: clamp(8px, 2vw, 28px);
+}
+
+/* Subtítulo — Tactic Sans Regular */
+.hero-808__subtitle {
+  font-family: 'Tactic Sans', sans-serif;
+  color: #fff;
+  font-weight: 400;
+  margin-top: 16px;
+  letter-spacing: 0.04em;
+  font-size: clamp(0.8rem, 2.2vw, 1.5rem);
+}
+
+/* --- Animação de entrada --- */
+.hero-808 .fade-in {
+  opacity: 0;
+  animation: hero808FadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes hero808FadeIn {
+  from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+/* --- Fallback sem WebGL --- */
+.hero-808.no-webgl canvas { display: none; }

@@ -37,20 +37,17 @@
     </header>
 
     <main>
-        <!-- Hero Section -->
-        <section class="hero-clean">
-            <div class="midiaBackground">
-                <video autoplay muted loop playsinline preload="auto" poster="assets/img/bg-hero.webp">
-                    <source src="assets/img/video-hero.webm" type="video/webm">
-                </video>
+        <section class="hero-808" id="hero-808">
+          <div class="hero-808__overlay">
+            <div class="hero-808__title">
+              <span class="fade-in" style="animation-delay:.05s">Build</span>
+              <span class="fade-in" style="animation-delay:.20s">Your</span>
+              <span class="fade-in" style="animation-delay:.35s">Dreams</span>
             </div>
-            <div class="hero-overlay"></div>
-            <div class="hero-bottom-fade"></div>
-            <div class="hero-bottom-title">
-                <div class="title-mask">
-                    <h1 class="reveal-up-text hero-giant">SUBMUNDO<span class="hero-dog" aria-hidden="true"></span>808</h1>
-                </div>
+            <div class="hero-808__subtitle fade-in" style="animation-delay:.7s">
+              AI-powered creativity for the next generation.
             </div>
+          </div>
         </section>
 
         <!-- Eventos (Reference HTML Structure) -->
@@ -337,5 +334,10 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/SplitText.min.js"></script>
     <script src="js/main.js?v=20"></script>
+
+    <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js" } }
+    </script>
+    <script type="module" src="js/hero-808.js"></script>
 </body>
 </html>
