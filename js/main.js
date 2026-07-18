@@ -309,10 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSlider(0);
     }
 
-    // 6. Hero animations — same stack as the reference (GSAP ScrollTrigger + Lenis)
-    const heroSection = document.querySelector('.hero-clean');
-    const heroBg = document.querySelector('.midiaBackground');
-    const heroTitle = document.querySelector('.hero-giant');
+    // 6. Animações de scroll (GSAP ScrollTrigger + Lenis)
     const hasGSAP = window.gsap && window.ScrollTrigger;
 
     if (hasGSAP) {
@@ -405,26 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
             });
         });
-
-        // Background parallax — the footage drifts down 50vh across the hero scroll,
-        // exactly like the reference: gsap.to(target, { y:'50vh', scrub:true }).
-        if (heroBg && heroSection) {
-            // Layer is 150% tall with 50% headroom above; 33% of its height ≈ 49.5vh
-            // of downward drift — stays within the headroom so no gap can appear.
-            gsap.to(heroBg, {
-                yPercent: 33,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: heroSection,
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: true,
-                },
-            });
-        }
-
-        // Hero title mask reveal is handled by the CSS keyframe (`.reveal-up-text`) —
-        // reliable and visually identical, and it can never get stuck hidden.
 
         // ------------------------------------------------------------
         // 6b. Text-reveal nos títulos de seção (.section-title)
@@ -561,22 +538,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
             requestAnimationFrame(raf);
         }
-        if (heroBg && heroSection) {
-            let ticking = false;
-            const updateHeroParallax = () => {
-                const scrolled = window.scrollY || window.pageYOffset;
-                if (scrolled <= heroSection.offsetHeight) {
-                    // 0.33 factor to match the GSAP path and stay within the headroom
-                    heroBg.style.transform = `translate3d(0, ${scrolled * 0.33}px, 0)`;
-                }
-                ticking = false;
-            };
-            window.addEventListener('scroll', () => {
-                if (!ticking) { requestAnimationFrame(updateHeroParallax); ticking = true; }
-            }, { passive: true });
-            updateHeroParallax();
-        }
-        // CSS keyframe handles the title reveal in this fallback path.
     }
 
     // Smooth-scroll for in-page anchor links via Lenis

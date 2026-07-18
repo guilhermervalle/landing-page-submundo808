@@ -349,76 +349,7 @@ h1, h2, h3, h4 {
 .menu-link:nth-child(4) { transition-delay: 0.25s; }
 .menu-link:nth-child(5) { transition-delay: 0.3s; }
 
-/* Hero Section */
-.hero-clean {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.midiaBackground {
-    position: absolute;
-    /* Oversized with headroom above so the scroll parallax (moves the layer
-       DOWN) never reveals empty space at the top of the hero. */
-    top: -50%;
-    left: 0;
-    width: 100%;
-    height: 150%;
-    z-index: 1;
-    will-change: transform; /* scroll parallax target */
-}
-
-.midiaBackground img,
-.midiaBackground video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* subtle slow zoom on the footage, like the reference */
-    animation: heroZoom 20s ease-out forwards;
-}
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background:
-        linear-gradient(to top, rgba(3,3,3,0.55) 0%, rgba(3,3,3,0.1) 40%, rgba(3,3,3,0.3) 100%);
-}
-
-/* Black gradient at the end of the hero → smooth blend into the next section.
-   Sits OVER the video (z2) but BEHIND the SUBMUNDO text (z3). */
-.hero-bottom-fade {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 45vh;
-    z-index: 2;
-    pointer-events: none;
-    background: linear-gradient(to bottom,
-        rgba(4, 4, 4, 0) 0%,
-        rgba(4, 4, 4, 0.6) 55%,
-        #040404 100%);
-}
-
-.hero-bottom-title {
-    position: relative;
-    z-index: 3;
-    width: 100%;
-    text-align: center;
-    padding: 0 2% 3vh; /* menos margem lateral p/ caber a fonte maior */
-}
-
-.title-mask {
-    overflow: hidden;
-    padding-bottom: 0.08em; /* keep descenders/italic slant from clipping */
-    line-height: 0.9;
-}
-
+/* .reveal-up-text: reveal do título (ainda usado no "SOBRE NÓS" do about.html) */
 .reveal-up-text {
     display: block;
     transform: translateY(110%);
@@ -426,57 +357,11 @@ h1, h2, h3, h4 {
     animation: revealUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
 }
 
-.hero-giant {
-    font-family: 'Tactic-Sans-Title', sans-serif;
-    /* cabe "SUBMUNDO + logo + 808" numa linha só, com pequena margem lateral */
-    font-size: clamp(1.3rem, 6.85vw, 8.2rem);
-    line-height: 0.9;
-    letter-spacing: -0.02em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    margin: 0;
-    /* alinha SUBMUNDO + logo do cachorro + 808 na mesma linha */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.08em;
-    /* gradiente vermelho (metálico) */
-    background-image: linear-gradient(180deg, #ff3b3b 0%, #E50000 52%, #9c0000 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-}
-
-/* Logo do cachorro entre SUBMUNDO e 808 no título do hero.
-   Mesmo gradiente metálico das letras, recortado na forma do cachorro (mask). */
-.hero-dog {
-    height: 0.7em;
-    aspect-ratio: 1 / 1;
-    flex: 0 0 auto;
-    /* sobe um pouco p/ centralizar com as MAIÚSCULAS (a caixa de linha inclui
-       espaço de descida embaixo, o que deixava o cachorro parecendo baixo) */
-    position: relative;
-    top: -0.1em;
-    background-image: linear-gradient(180deg, #ff3b3b 0%, #E50000 52%, #9c0000 100%);
-    -webkit-mask: url('../assets/img/logo_cachorro_branco.svg') no-repeat center / contain;
-    mask: url('../assets/img/logo_cachorro_branco.svg') no-repeat center / contain;
-}
-
-.delay-1 {
-    animation-delay: 0.35s;
-}
-
 @keyframes revealUp {
     to {
         transform: translateY(0);
         opacity: 1;
     }
-}
-
-@keyframes heroZoom {
-    from { transform: scale(1.12); }
-    to   { transform: scale(1); }
 }
 
 /* Eventos (Videos Style) */

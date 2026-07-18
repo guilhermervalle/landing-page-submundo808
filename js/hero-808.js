@@ -14,6 +14,26 @@ const TILT_STRENGTH   = 0.22;  // inclinação seguindo o mouse (rad). Maior = m
 const LIGHT_STRENGTH  = 0.6;   // força da luz que acende o relevo perto do cursor
 const DESKTOP_WIDTH   = 0.62;  // quanto da largura o 808 ocupa no desktop (0-1)
 const MOBILE_WIDTH    = 0.9;   // idem no mobile
+// Densidade dos pontinhos vermelhos. O original usa 120 num objeto pequeno.
+// Como seu 808 é MAIOR na tela, subimos pra manter os pontos finos como no exemplo.
+// Pontos grandes/espaçados demais -> aumente. Poluído/denso demais -> diminua.
+const DOT_DENSITY     = 260;
+// --- Comportamento do "flash" vermelho (varredura) ---
+// Agrupa a profundidade em faixas. 0 = varredura SUAVE e fluida (as luzes deslizam).
+// Valores > 0 fazem a luz "pular" entre faixas (mais separado, porém menos fluido).
+const DEPTH_LEVELS    = 0;
+// Largura da faixa que acende. Maior = área maior acesa ao mesmo tempo.
+const FLOW_WIDTH      = 0.03;
+// Linha horizontal vermelha SÓLIDA. 0 = desligada (referência é tudo pontilhada).
+// Coloque 0.4 se quiser a linha sólida do código original.
+const SCAN_LINE       = 0.0;
+// --- Ritmo da varredura ---
+// 'smooth'  = varredura contínua, as luzes SE MOVEM (recomendado / como o original).
+// 'stepped' = pisca uma faixa de cada vez, parado (geralmente fica ruim).
+const SWEEP_MODE      = 'smooth';
+const STEP_HOLD       = 0.55;  // (só no modo stepped)
+const STEP_GAP        = 0.30;  // (só no modo stepped)
+const SWEEP_SPEED     = 0.35;  // velocidade da varredura contínua. Menor = mais lento/suave
 // ---------------------------------------------------------------
 
 const container = document.getElementById('hero-808');
@@ -58,6 +78,11 @@ function initHero808(container) {
     uScan:     { value: 0 },   // linha de scan horizontal
     uAspect:   { value: IMG_ASPECT },
     uTilt:     { value: LIGHT_STRENGTH },
+    uTiling:   { value: DOT_DENSITY },
+    uLevels:   { value: DEPTH_LEVELS },
+    uFlowWidth:{ value: FLOW_WIDTH },
+    uScanLine: { value: SCAN_LINE },
+    uFlowActive:{ value: 1 },
   };
 
   const vertex = `
@@ -79,6 +104,11 @@ function initHero808(container) {
     uniform float uScan;
     uniform float uAspect;
     uniform float uTilt; // reaproveitado como intensidade de luz
+    uniform float uTiling;
+    uniform float uLevels;
+    uniform float uFlowWidth;
+    uniform float uScanLine;
+    uniform float uFlowActive;
 
     float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     // cell noise ~ valor aleatório por célula (aprox. do mx_cell_noise_float)
@@ -97,13 +127,19 @@ function initHero808(container) {
 
       // --- grade de pontos vermelhos fluindo pela profundidade ---
       vec2 tUv = vec2(vUv.x * uAspect, vUv.y);
-      vec2 tiling = vec2(120.0);
+      vec2 tiling = vec2(uTiling);
       vec2 tiledUv = mod(tUv * tiling, 2.0) - 1.0;
       float brightness = cellNoise(tUv * tiling / 2.0);
       float dist = length(tiledUv);
       float dots = smoothstep(0.5, 0.49, dist) * brightness;
-      float flow = 1.0 - smoothstep(0.0, 0.02, abs(depthR - uProgress));
-      vec3 mask = dots * flow * vec3(10.0, 0.0, 0.0) * objectMask;
+      // profundidade agrupada em faixas: regiões inteiras acendem juntas (flash)
+      float dFlow = depthR;
+      if (uLevels > 0.5) {
+        dFlow = floor(depthR * uLevels + 0.5) / uLevels;
+      }
+      float flow = (1.0 - smoothstep(0.0, uFlowWidth, abs(dFlow - uProgress))) * uFlowActive;
+      // pontos aparecem em TODO o plano (objeto + fundo), varrendo pela profundidade
+      vec3 mask = dots * flow * vec3(10.0, 0.0, 0.0);
 
       // --- blend screen (base + pontos vermelhos) ---
       vec3 blended = 1.0 - (1.0 - tMap) * (1.0 - mask);
@@ -117,11 +153,14 @@ function initHero808(container) {
       // --- scan horizontal vermelho ---
       float scanWidth = 0.05;
       float scanLine = smoothstep(0.0, scanWidth, abs(vUv.y - uScan));
-      vec3 redOverlay = vec3(1.0, 0.0, 0.0) * (1.0 - scanLine) * 0.4;
+      vec3 redOverlay = vec3(1.0, 0.0, 0.0) * (1.0 - scanLine) * uScanLine;
       float scanMix = smoothstep(0.9, 1.0, 1.0 - scanLine) * objectMask;
       vec3 finalColor = mix(lit, lit + redOverlay, scanMix);
 
-      gl_FragColor = vec4(finalColor, objectMask);
+      // alpha: objeto + pontos vermelhos visíveis no fundo
+      float dotAlpha = clamp(dots * flow, 0.0, 1.0);
+      float alpha = clamp(max(objectMask, dotAlpha), 0.0, 1.0);
+      gl_FragColor = vec4(finalColor, alpha);
     }
   `;
 
@@ -179,10 +218,34 @@ function initHero808(container) {
     requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
 
-    // scan animado (igual ao original)
-    const wave = Math.sin(t * 0.5) * 0.5 + 0.5;
-    uniforms.uProgress.value = wave;
-    uniforms.uScan.value = wave;
+    // --- varredura vermelha ---
+    let progress, flowActive;
+    if (SWEEP_MODE === 'stepped') {
+      // acende uma faixa de profundidade por vez, com pausa entre elas
+      const levels = DEPTH_LEVELS;
+      const slot = STEP_HOLD + STEP_GAP;
+      const total = slot * (levels + 1);
+      const tt = t % total;
+      const idx = Math.floor(tt / slot);   // qual faixa (0..levels)
+      const inSlot = tt - idx * slot;      // tempo dentro do slot
+      progress = idx / levels;             // profundidade dessa faixa
+      // pulso suave: fade in/out dentro do tempo aceso
+      const fade = 0.12;
+      if (inSlot < STEP_HOLD) {
+        const a = Math.min(inSlot / fade, 1);
+        const b = Math.min((STEP_HOLD - inSlot) / fade, 1);
+        flowActive = Math.max(0, Math.min(a, b));
+      } else {
+        flowActive = 0; // pausa (escuro)
+      }
+    } else {
+      progress = Math.sin(t * SWEEP_SPEED) * 0.5 + 0.5;
+      flowActive = 1;
+    }
+
+    uniforms.uProgress.value = progress;
+    uniforms.uFlowActive.value = flowActive;
+    uniforms.uScan.value = Math.sin(t * 0.5) * 0.5 + 0.5;
     uniforms.uPointer.value.set(pointer.x, pointer.y);
 
     // tilt: objeto inclina seguindo o mouse
