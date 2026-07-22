@@ -209,15 +209,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 5. Video Slider Logic (Center card + 2 side cards, circular)
-    const videoCards = Array.from(document.querySelectorAll('.slider_slide'));
-    const rulerItems = document.querySelectorAll('.slider-video_pagination-item');
-    const track = document.getElementById('videoSliderTrack');
-    const eventosBg = document.getElementById('eventosBg');
-    const prevBtn = document.getElementById('sliderPrev');
-    const nextBtn = document.getElementById('sliderNext');
+    // 5. Video Slider (card central + laterais, circular).
+    //    Escopado por componente porque a página tem DOIS: EVENTOS e VÍDEOS.
+    document.querySelectorAll('[data-video-slider-component]').forEach(initVideoSlider);
 
-    if (videoCards.length > 0 && track) {
+    function initVideoSlider(root) {
+        const section = root.closest('section') || root;
+        const videoCards = Array.from(root.querySelectorAll('.slider_slide'));
+        const rulerItems = root.querySelectorAll('.slider-video_pagination-item');
+        const track = root.querySelector('[data-slide-wrapper]');
+        const eventosBg = section.querySelector('.eventos-bg');
+        const prevBtn = root.querySelector('[data-slider-prev]');
+        const nextBtn = root.querySelector('[data-slider-next]');
+
+        if (!videoCards.length || !track) return;
+
         const total = videoCards.length;
         // Laterais nas extremidades (parcialmente fora da tela)
         function getSideOffset() {
@@ -240,10 +246,40 @@ document.addEventListener('DOMContentLoaded', () => {
             bgActiveLayer = 1 - bgActiveLayer;
         }
 
+        // YouTube: o iframe só é montado no clique — 7 embeds de uma vez pesariam demais —
+        // e é destruído ao sair do centro, senão o áudio continua tocando fora de vista.
+        function stopVideo(card) {
+            const embed = card.querySelector('.slider_video-embed');
+            if (embed) embed.remove();
+            card.classList.remove('is-playing');
+        }
+
+        function playVideo(card) {
+            const id = card.dataset.ytId;
+            if (!id || card.querySelector('.slider_video-embed')) return;
+            const embed = document.createElement('div');
+            embed.className = 'slider_video-embed';
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.youtube-nocookie.com/embed/' + id +
+                '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+            const label = card.querySelector('h3');
+            iframe.title = label ? label.textContent.trim() : 'Vídeo Submundo 808';
+            iframe.setAttribute('allow',
+                'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+            iframe.allowFullscreen = true;
+            embed.appendChild(iframe);
+            card.appendChild(embed);
+            card.classList.add('is-playing');
+        }
+
+        // Navegação por botões FIXOS nas laterais (fora dos cards): não precisam ser
+        // escondidos durante o slide, pois não se movem.
         function updateSlider(activeIndex) {
             currentIndex = (parseInt(activeIndex) + total) % total;
 
             videoCards.forEach((card, index) => {
+                if (index !== currentIndex) stopVideo(card);
+
                 let rel = (index - currentIndex + total) % total;
                 let pos = rel;
                 if (rel > total / 2) pos = rel - total; // wrap: last item goes to the left (-1)
@@ -278,10 +314,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeImg) setBackground(activeImg.currentSrc || activeImg.src);
         }
 
-        // Click a side card to bring it to the center
+        // Clique: card lateral vem para o centro; card central que tenha vídeo, toca.
         videoCards.forEach((card, index) => {
             card.addEventListener('click', () => {
-                if (index !== currentIndex) updateSlider(index);
+                if (index !== currentIndex) { updateSlider(index); return; }
+                if (card.dataset.ytId) playVideo(card);
             });
         });
 
@@ -292,8 +329,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (prevBtn) prevBtn.addEventListener('click', () => updateSlider(currentIndex - 1));
         if (nextBtn) nextBtn.addEventListener('click', () => updateSlider(currentIndex + 1));
 
-        // Keyboard navigation
+        // Setas do teclado só agem no slider que está na tela — senão os dois andariam juntos
+        let inView = false;
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver((entries) => {
+                inView = entries[0].isIntersecting;
+            }, { threshold: 0.35 }).observe(section);
+        }
         document.addEventListener('keydown', (e) => {
+            if (!inView) return;
             if (e.key === 'ArrowLeft') updateSlider(currentIndex - 1);
             if (e.key === 'ArrowRight') updateSlider(currentIndex + 1);
         });

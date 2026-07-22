@@ -250,11 +250,13 @@ h1, h2, h3, h4 {
     }
     .menu-toggle { padding: 10px 0 10px 4px; }
     .menu-toggle .line { width: 26px; }
-    .logo img { height: 50px; }
+    .logo img { height: 70px; }
 }
 
+/* O logo é quadrado (447x447) e o antigo era 2:1. Para manter a mesma presença visual,
+   o lado é a raiz da área antiga: 62 x 124 = 7700 -> 88px. Mesma conta no mobile e no rodapé. */
 .logo img {
-    height: 62px;
+    height: 88px;
 }
 
 .logo-text {
@@ -383,6 +385,17 @@ h1, h2, h3, h4 {
 .eventos-videos .section-title {
     letter-spacing: 0.04em;
     margin-bottom: clamp(8px, 1.5vh, 20px);
+}
+
+/* #videos tem título de DUAS linhas ("SINTA A EXPERIÊNCIA"), que somava ~88px a mais
+   que o "EVENTOS" de uma linha e empurrava a seção além de 100vh — aí ela não emoldurava
+   no scroll. Compensamos aqui: padding menor + slider um pouco mais baixo, só nesta seção,
+   para o conteúdo caber em 100vh de 1080 até ~700px de altura (medido). */
+#videos {
+    padding: clamp(28px, 4.5vh, 64px) 0;
+}
+#videos .slider_component {
+    height: min(620px, 64vh);
 }
 
 /* Blurred background built from the ACTIVE card image (crossfade on change) */
@@ -532,8 +545,12 @@ h1, h2, h3, h4 {
 .corner.is-3 { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 .corner.is-4 { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
 
-/* Play button shows on the SIDE (inactive) cards, hidden on the active one */
-.video-play {
+/* Botões de play POR CARD desativados: a navegação agora é pelos botões FIXOS das laterais
+   (que não se movem). Escondido em vez de removido do HTML para manter a estrutura. */
+.video-play { display: none; }
+
+/* (regras antigas mantidas, sem efeito enquanto .video-play está display:none) */
+.video-play-legacy {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -548,7 +565,7 @@ h1, h2, h3, h4 {
     border-radius: 50%;
     opacity: 1;
     box-shadow: 0 0 0 rgba(229, 0, 0, 0.6);
-    transition: opacity 0.6s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .video-play:hover {
@@ -659,45 +676,48 @@ h1, h2, h3, h4 {
     color: #fff;
 }
 
-/* Nav Buttons (hidden — navigation is done via the red play buttons on the side cards) */
+/* Botões de navegação FIXOS nas laterais (não ficam dentro dos cards, então não se movem
+   nem somem durante a transição). Ficam sobre o centro dos cards laterais: mesma conta do
+   getSideOffset() do JS — clamp(300px, 47vw, 760px) a partir do centro. */
 .slider_button-wrapper {
-    display: none;
-}
-
-.slider_button-wrapper-legacy {
     position: absolute;
-    top: 40%;
+    top: 39%;              /* centro vertical dos cards (= .slider-wrapper top) */
     left: 0;
-    width: 100%;
-    justify-content: space-between;
-    padding: 0 2%;
-    transform: translateY(-50%);
-    pointer-events: none;
+    right: 0;
+    height: 0;
     z-index: 20;
+    pointer-events: none;
 }
 
 .slider-button {
-    position: relative;
-    width: 52px;
-    height: 52px;
+    position: absolute;
+    top: 0;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
     border: none;
-    background: transparent;
+    border-radius: 50%;
+    background: var(--accent);
     color: #fff;
     cursor: pointer;
     pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.55;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    box-shadow: 0 0 0 rgba(229, 0, 0, 0.6);
+    transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.slider-button svg { width: 100%; height: 100%; }
-.slider-button svg path:first-child { fill: #fff; }
+.slider-button[data-slider-prev] { left: calc(50% - clamp(300px, 47vw, 760px)); }
+.slider-button[data-slider-next] { left: calc(50% + clamp(300px, 47vw, 760px)); }
+
+.slider-button svg { width: 26px; height: 26px; }
 
 .slider-button:hover {
-    opacity: 1;
-    transform: scale(1.06);
+    background: #ff1a1a;
+    transform: translate(-50%, -50%) scale(1.06);
+    box-shadow: 0 6px 26px rgba(229, 0, 0, 0.45);
 }
 
 /* Responsive */
@@ -715,9 +735,13 @@ h1, h2, h3, h4 {
 
 @media (max-width: 560px) {
     .slider_slide { opacity: 0.5; }
-    .slider-button { width: 40px; height: 40px; }
+    /* Em telas estreitas os cards laterais saem quase de vez; traz os botões para perto
+       das bordas visíveis em vez de ±300px (que ficaria fora da tela). */
+    .slider-button { width: 46px; height: 46px; }
+    .slider-button[data-slider-prev] { left: 12%; }
+    .slider-button[data-slider-next] { left: 88%; }
+    .slider-button svg { width: 20px; height: 20px; }
     .slider_slide_title h3 { font-size: 0.8rem; }
-    .video-play { width: 48px; height: 48px; }
     .corner-wrapper { top: -18px; left: -18px; right: -18px; bottom: -18px; }
     .corner { width: 16px; height: 16px; }
 }
@@ -783,31 +807,26 @@ h1, h2, h3, h4 {
 .reveal-clip.delay-3 { transition-delay: 0.3s; }
 
 
-/* Spotify Section */
-.spotify-section {
+/* Vídeos do YouTube nos cards do slider (seção "SINTA A EXPERIÊNCIA").
+   Clicar no card central toca o vídeo (js/main.js -> playVideo); o iframe é montado
+   sobre a thumb e destruído ao sair do centro. Sem botão, o cursor é a pista de clique. */
+.slider_slide.is-video.active:not(.is-playing) { cursor: pointer; }
+
+.slider_video-embed {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
     background: #000;
+    overflow: hidden;
 }
 
-.spotify-wrapper {
-    max-width: 1000px;
-    margin: 0 auto;
-    position: relative;
-    border-radius: 14px;
-    /* Brand-red frame matching the INGRESSOS button */
-    padding: 6px;
-    background: var(--accent);
-    box-shadow: 0 0 40px rgba(229, 0, 0, 0.35);
-    transition: box-shadow 0.4s ease;
-}
-
-.spotify-wrapper:hover {
-    box-shadow: 0 0 60px rgba(229, 0, 0, 0.55);
-}
-
-.spotify-wrapper iframe {
+.slider_video-embed iframe {
     display: block;
-    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
+
 
 /* CTA */
 .cta-minimal {
@@ -926,6 +945,49 @@ h1, h2, h3, h4 {
     }
 }
 
+.explore-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 60;
+  /* centralizado no rodapé — sem transform, p/ não conflitar com a animação de entrada */
+  position: absolute;
+  bottom: 2rem;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
+}
+
+.explore-arrow {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(10px);
+  }
+  60% {
+    transform: translateY(5px);
+  }
+}
+
+/* -------------------------------------
+   SECTION: EVENTOS E VÍDEOS
+------------------------------------- */
 /* -------------------------------------
    ABOUT PAGE STYLES
 -------------------------------------- */
@@ -1456,7 +1518,7 @@ h1, h2, h3, h4 {
 }
 
 .footer-col-logo img {
-    height: 40px;
+    height: 56px;
     margin-bottom: 20px;
 }
 
@@ -2036,36 +2098,54 @@ h1, h2, h3, h4 {
 }
 
 /* Título — Tactic Sans Extra Extended Ultra Italic */
+/* <div className="text-3xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold">
+     <div className="flex space-x-2 lg:space-x-6 overflow-hidden text-white">  */
 .hero-808__title {
   font-family: 'Tactic Sans Title', sans-serif;
   color: #fff;
-  font-weight: 800;
+  font-weight: 800;              /* font-extrabold */
   font-style: italic;
   line-height: 1;
   letter-spacing: 0.01em;
-  font-size: clamp(2rem, 7vw, 5.5rem);
+  font-size: 1.875rem;           /* text-3xl */
   display: flex;
-  gap: clamp(8px, 2vw, 28px);
+  gap: 0.5rem;                   /* space-x-2 */
+  overflow: hidden;
+}
+@media (min-width: 768px)  { .hero-808__title { font-size: 3rem; } }      /* md:text-5xl */
+@media (min-width: 1024px) { .hero-808__title { gap: 1.5rem; } }          /* lg:space-x-6 */
+@media (min-width: 1280px) { .hero-808__title { font-size: 3.75rem; } }   /* xl:text-6xl */
+@media (min-width: 1536px) { .hero-808__title { font-size: 4.5rem; } }    /* 2xl:text-7xl */
+
+/* <div className="text-xs md:text-xl xl:text-2xl 2xl:text-3xl mt-2 overflow-hidden ..."> */
+.hero-808__subtitle-wrap {
+  margin-top: 0.5rem;            /* mt-2 */
+  overflow: hidden;
 }
 
-/* Subtítulo — Tactic Sans Regular */
 .hero-808__subtitle {
   font-family: 'Tactic Sans', sans-serif;
   color: #fff;
-  font-weight: 400;
-  margin-top: 16px;
+  font-weight: 700;              /* font-bold */
   letter-spacing: 0.04em;
-  font-size: clamp(0.8rem, 2.2vw, 1.5rem);
+  font-size: 0.75rem;            /* text-xs */
 }
+@media (min-width: 768px)  { .hero-808__subtitle { font-size: 1.25rem; } }  /* md:text-xl */
+@media (min-width: 1280px) { .hero-808__subtitle { font-size: 1.5rem; } }   /* xl:text-2xl */
+@media (min-width: 1536px) { .hero-808__subtitle { font-size: 1.875rem; } } /* 2xl:text-3xl */
 
-/* --- Animação de entrada --- */
-.hero-808 .fade-in {
+/* --- Animação de entrada (classes .fade-in / .fade-in-subtitle do componente) --- */
+.hero-808 .fade-in,
+.hero-808 .fade-in-subtitle {
   opacity: 0;
-  animation: hero808FadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: hero808FadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, clip-path;
 }
+/* reveal: cada palavra sobe surgindo por trás de uma máscara + desfoque */
 @keyframes hero808FadeIn {
-  from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+  0%   { opacity: 0; transform: translateY(0.6em); clip-path: inset(0 0 100% 0); filter: blur(8px); }
+  55%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0);     clip-path: inset(-0.12em 0 -0.18em 0); filter: blur(0); }
 }
 
 /* --- Fallback sem WebGL --- */

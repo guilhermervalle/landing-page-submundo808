@@ -16,7 +16,7 @@
             <a href="about.html" class="menu-link" data-text="SOBRE NÓS">SOBRE NÓS</a>
             <a href="loja.html" class="menu-link" data-text="LOJA">LOJA</a>
             <a href="#eventos" class="menu-link menu-close" data-text="EVENTOS">EVENTOS</a>
-            <a href="#spotify" class="menu-link menu-close" data-text="PLAYLIST">PLAYLIST</a>
+            <a href="#videos" class="menu-link menu-close" data-text="VÍDEOS">VÍDEOS</a>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
     <header class="top-bar">
         <div class="container top-bar-content">
             <a href="index.html" class="logo">
-                <img src="assets/img/logo.svg" alt="SUBMUNDO 808" onerror="this.outerHTML='<h2 class=\'logo-text\'>SUBMUNDO 808</h2>'">
+                <img src="assets/img/logo%20808prod.svg" alt="SUBMUNDO 808" onerror="this.outerHTML='<h2 class=\'logo-text\'>SUBMUNDO 808</h2>'">
             </a>
             <div class="header-right">
                 <a href="#comprar" class="btn-ticket">INGRESSOS</a>
@@ -40,14 +40,26 @@
         <section class="hero-808" id="hero-808">
           <div class="hero-808__overlay">
             <div class="hero-808__title">
-              <span class="fade-in" style="animation-delay:.05s">Build</span>
-              <span class="fade-in" style="animation-delay:.20s">Your</span>
-              <span class="fade-in" style="animation-delay:.35s">Dreams</span>
+              <div data-hero-word>Build</div>
+              <div data-hero-word>Your</div>
+              <div data-hero-word>Dreams</div>
             </div>
-            <div class="hero-808__subtitle fade-in" style="animation-delay:.7s">
-              AI-powered creativity for the next generation.
+            <div class="hero-808__subtitle-wrap">
+              <div class="hero-808__subtitle" data-hero-subtitle>
+                AI-powered creativity for the next generation.
+              </div>
             </div>
           </div>
+
+          <button class="explore-btn fade-in" style="animation-delay: 2.2s">
+            Scroll to explore
+            <span class="explore-arrow">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="arrow-svg">
+                <path d="M11 5V17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 12L11 17L16 12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
         </section>
 
         <!-- Eventos (Reference HTML Structure) -->
@@ -138,11 +150,11 @@
 
                     <!-- Navigation Arrows -->
                     <div class="slider_button-wrapper">
-                        <button class="slider-button" id="sliderPrev">
-                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M32.3265 7.89461L44 7.89461L44 40.0527H38.6939L38.6939 44L10.2295 44V36.1185H-3.8147e-06L-3.8147e-06 3.94731L5.30612 3.9473V0L32.3265 0V7.89461Z" fill="currentColor"></path><path d="M12 22L24 10V18H36V26H24V34L12 22Z" fill="#000"></path></svg>
+                        <button class="slider-button" id="sliderPrev" data-slider-prev>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
                         </button>
-                        <button class="slider-button" id="sliderNext">
-                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M32.3265 7.89461L44 7.89461L44 40.0527H38.6939L38.6939 44L10.2295 44V36.1185H-3.8147e-06L-3.8147e-06 3.94731L5.30612 3.9473V0L32.3265 0V7.89461Z" fill="currentColor"></path><path d="M32 22L20 34V26H8V18H20V10L32 22Z" fill="#000"></path></svg>
+                        <button class="slider-button" id="sliderNext" data-slider-next>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
                         </button>
                     </div>
 
@@ -216,12 +228,97 @@
             </div>
         </section>
 
-        <!-- Spotify Section -->
-        <section class="spotify-section section-padding native-cursor" id="spotify">
-            <div class="container">
-                <h2 class="section-title text-center">OUÇA NOSSA PLAYLIST</h2>
-                <div class="spotify-wrapper">
-                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1tdjv3oDOnc?utm_source=generator&theme=0" width="100%" height="450" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <!-- Vídeos (mesmo sistema de cards da seção EVENTOS).
+             Cada card carrega só a thumb do YouTube; o iframe é montado no clique
+             (js/main.js -> initVideoSlider) e destruído ao sair do centro.
+             Para trocar um vídeo: mude data-yt-id, o src da thumb e o <h3>. -->
+        <section class="eventos-videos section-padding overflow-hidden" id="videos">
+            <div class="eventos-bg">
+                <div class="eventos-bg-layer is-active"></div>
+                <div class="eventos-bg-layer"></div>
+            </div>
+            <div class="section-blur"></div>
+            <div class="container padding-global">
+                <h2 class="section-title text-center z-2">SINTA A EXPERIÊNCIA</h2>
+
+                <div class="slider-overlay"></div>
+                <div class="slider-overlay is-right"></div>
+
+                <div data-video-slider-component="" class="slider_component">
+                    <div class="slider w-dyn-list">
+                        <div data-slide-wrapper="" role="list" class="slider-wrapper is-video w-dyn-items">
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item active" data-index="0" data-yt-id="hnHM_Zt_3lo">
+                                <img src="https://i.ytimg.com/vi/hnHM_Zt_3lo/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/hnHM_Zt_3lo/hqdefault.jpg'" alt="DJ Alexia — Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">DJ ALEXIA</h3></div>
+                            </div>
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item" data-index="1" data-yt-id="wsOiHX-fht8">
+                                <img src="https://i.ytimg.com/vi/wsOiHX-fht8/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/wsOiHX-fht8/hqdefault.jpg'" alt="DJ Delazari — Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">DJ DELAZARI</h3></div>
+                            </div>
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item" data-index="2" data-yt-id="BO2jX8gAYHM">
+                                <img src="https://i.ytimg.com/vi/BO2jX8gAYHM/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/BO2jX8gAYHM/hqdefault.jpg'" alt="Clei B2B Tresk — Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">CLEI B2B TRESK</h3></div>
+                            </div>
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item" data-index="3" data-yt-id="rNq7hHEKYhA">
+                                <img src="https://i.ytimg.com/vi/rNq7hHEKYhA/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rNq7hHEKYhA/hqdefault.jpg'" alt="DJ Christopher Luz — Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">DJ CHRISTOPHER LUZ</h3></div>
+                            </div>
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item" data-index="4" data-yt-id="plNyixLSjS4">
+                                <img src="https://i.ytimg.com/vi/plNyixLSjS4/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/plNyixLSjS4/hqdefault.jpg'" alt="DJ Thiago Martins — Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">DJ THIAGO MARTINS</h3></div>
+                            </div>
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item" data-index="5" data-yt-id="hHs51djKnBw">
+                                <img src="https://i.ytimg.com/vi/hHs51djKnBw/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/hHs51djKnBw/hqdefault.jpg'" alt="DJ Caio Prince — Festival Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">DJ CAIO PRINCE</h3></div>
+                            </div>
+
+                            <div data-slide="" role="listitem" class="slider_slide is-video w-dyn-item" data-index="6" data-yt-id="01chIPfG9M0">
+                                <img src="https://i.ytimg.com/vi/01chIPfG9M0/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/01chIPfG9M0/hqdefault.jpg'" alt="DJ Delcu — Submundo 808 DJ Set" class="image-cover z-2 is-video" loading="lazy">
+                                <div><div class="video-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div></div>
+                                <div class="corner-wrapper is-video"><div class="corner is-1"></div><div class="corner is-2"></div><div class="corner is-3"></div><div class="corner is-4"></div></div>
+                                <div class="slider_slide_title"><div class="spacer-12--36"></div><h3 class="text-size-16 text-style-1line">DJ DELCU</h3></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="slider_button-wrapper">
+                        <button class="slider-button" data-slider-prev aria-label="Vídeo anterior">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+                        </button>
+                        <button class="slider-button" data-slider-next aria-label="Próximo vídeo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="slider-video_pagination-wrapper">
+                        <div class="slider-video_pagination-item active" data-index="0"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">01</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                        <div class="slider-video_pagination-item" data-index="1"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">02</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                        <div class="slider-video_pagination-item" data-index="2"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">03</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                        <div class="slider-video_pagination-item" data-index="3"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">04</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                        <div class="slider-video_pagination-item" data-index="4"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">05</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                        <div class="slider-video_pagination-item" data-index="5"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">06</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                        <div class="slider-video_pagination-item" data-index="6"><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line is-big"><div class="slider-video_pagination-item_line_text">07</div></div><div class="slider-video_pagination-item_line"></div><div class="slider-video_pagination-item_line"></div></div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -260,7 +357,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col footer-col-logo">
-                    <img src="assets/img/logo.svg" alt="SUBMUNDO 808" onerror="this.outerHTML='<h2 class=\'logo-text\'>SUBMUNDO 808</h2>'">
+                    <img src="assets/img/logo%20808prod.svg" alt="SUBMUNDO 808" onerror="this.outerHTML='<h2 class=\'logo-text\'>SUBMUNDO 808</h2>'">
                 </div>
 
                 <div class="footer-col">
@@ -333,16 +430,18 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/SplitText.min.js"></script>
-    <script src="js/main.js?v=21"></script>
+    <script src="js/main.js?v=26"></script>
 
     <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+        "three": "https://unpkg.com/three@0.170.0/build/three.webgpu.js",
+        "three/webgpu": "https://unpkg.com/three@0.170.0/build/three.webgpu.js",
+        "three/tsl": "https://unpkg.com/three@0.170.0/build/three.webgpu.js",
+        "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
       }
     }
     </script>
-    <script type="module" src="js/hero-808.js"></script>
+    <script type="module" src="js/hero-808.js?v=40"></script>
 </body>
 </html>
