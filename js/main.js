@@ -597,3 +597,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/* --- Loja Deep Parallax Hero --- */
+if (document.querySelector('#lojaParallax')) {
+    // Forçar overscroll-behavior none no JS para evitar problemas de cache do CSS
+    document.documentElement.style.overscrollBehavior = 'none';
+    document.body.style.overscrollBehavior = 'none';
+    
+    const lojaParallaxTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: '#lojaParallax',
+            start: 1, // Começa apenas 1px depois do topo para evitar bugs matemáticos em progressão negativa
+            end: '+=1500',
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1
+        }
+    });
+
+    // Fade and scale down foreground elements
+    lojaParallaxTl.fromTo('.fg-models, .fg-subtitle, .fg-action', {
+        y: 0,
+        scale: 1,
+        opacity: 1
+    }, {
+        y: -100,
+        scale: 0.9,
+        opacity: 0,
+        duration: 1
+    }, 0)
+    
+    // Scale up and reveal background store
+    .fromTo('.parallax-bg-store', {
+        z: -800,
+        scale: 1.5,
+        opacity: 0.2,
+        filter: 'blur(15px)'
+    }, {
+        z: 0,
+        scale: 1,
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 1.5
+    }, 0)
+    
+    // Transform 'LOJA' into neon sign
+    .fromTo('.neon-target', {
+        y: 0,
+        scale: 1,
+        color: '#dedede',
+        textShadow: '0 10px 30px rgba(0,0,0,0.8)'
+    }, {
+        y: '-15vh',
+        scale: 0.8,
+        color: '#fff',
+        textShadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e50000, 0 0 50px #e50000, 0 0 80px #e50000',
+        duration: 1.5
+    }, 0);
+}
